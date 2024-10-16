@@ -1,22 +1,22 @@
 package com.cch.cyclingmanager.entity;
 
 import lombok.Data;
-
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.Duration;
 
 @Data
 @Entity
 public class Result {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @EmbeddedId
+    private ResultId id;
 
     @ManyToOne
+    @MapsId("cyclistId")
     @JoinColumn(name = "cyclist_id")
     private Cyclist cyclist;
 
     @ManyToOne
+    @MapsId("phaseId")
     @JoinColumn(name = "phase_id")
     private Phase phase;
 
