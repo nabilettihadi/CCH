@@ -1,4 +1,7 @@
 package com.cch.cyclingmanager.repository;
 
-public class ResultRepository {
+import com.cch.cyclingmanager.entity.Result;
+import com.cch.cyclingmanager.entity.ResultId;
+
+public interface ResultRepository extends GenericRepository<Result, ResultId> {
 }

@@ -1,4 +1,6 @@
 package com.cch.cyclingmanager.repository;
 
-public class PhaseRepository {
+import com.cch.cyclingmanager.entity.Phase;
+
+public interface PhaseRepository extends GenericRepository<Phase, Long> {
 }

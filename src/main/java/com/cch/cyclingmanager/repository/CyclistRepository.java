@@ -1,4 +1,6 @@
 package com.cch.cyclingmanager.repository;
 
-public class CyclistRepository {
+import com.cch.cyclingmanager.entity.Cyclist;
+
+public interface CyclistRepository extends GenericRepository<Cyclist, Long> {
 }

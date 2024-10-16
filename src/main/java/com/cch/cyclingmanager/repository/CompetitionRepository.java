@@ -1,4 +1,6 @@
 package com.cch.cyclingmanager.repository;
 
-public class CompetitionRepository {
+import com.cch.cyclingmanager.entity.Competition;
+
+public interface CompetitionRepository extends GenericRepository<Competition, Long> {
 }
