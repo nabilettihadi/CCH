@@ -1,9 +1,8 @@
 package com.cch.cyclingmanager.entity;
 
-import jakarta.persistence.CascadeType;
 import lombok.Data;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.Set;
 
