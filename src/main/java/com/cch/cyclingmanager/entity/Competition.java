@@ -2,7 +2,7 @@ package com.cch.cyclingmanager.entity;
 
 import lombok.Data;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.Set;
 
@@ -17,6 +17,9 @@ public class Competition {
     private LocalDate endDate;
     private String location;
 
-    @OneToMany(mappedBy = "competition")
+    @OneToMany(mappedBy = "competition", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Phase> phases;
+
+    @OneToMany(mappedBy = "competition", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<GeneralResult> generalResults;
 }

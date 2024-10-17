@@ -7,9 +7,9 @@ import java.time.Duration;
 
 @Data
 @Entity
-public class Result {
+public class GeneralResult {
     @EmbeddedId
-    private ResultId id;
+    private GeneralResultId id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("cyclistId")
@@ -17,10 +17,10 @@ public class Result {
     private Cyclist cyclist;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("phaseId")
-    @JoinColumn(name = "phase_id")
-    private Phase phase;
+    @MapsId("competitionId")
+    @JoinColumn(name = "competition_id")
+    private Competition competition;
 
-    private Duration time;
-    private int position;
+    private Duration totalTime;
+    private int finalPosition;
 }

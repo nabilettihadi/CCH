@@ -1,15 +1,15 @@
 package com.cch.cyclingmanager.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import lombok.Data;
+
+import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.Set;
-
-import lombok.Data;
 
 @Data
 @Entity
 public class Phase {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -17,10 +17,10 @@ public class Phase {
     private double distance;
     private LocalDate date;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "competition_id")
     private Competition competition;
 
-    @OneToMany(mappedBy = "phase")
+    @OneToMany(mappedBy = "phase", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Result> results;
 }

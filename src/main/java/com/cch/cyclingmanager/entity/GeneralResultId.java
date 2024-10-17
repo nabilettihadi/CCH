@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 @Data
 @Embeddable
-public class ResultId implements Serializable {
+public class GeneralResultId implements Serializable {
     private Long cyclistId;
-    private Long phaseId;
+    private Long competitionId;
 }
