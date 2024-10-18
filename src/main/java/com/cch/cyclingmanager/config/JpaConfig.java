@@ -1,6 +1,7 @@
 package com.cch.cyclingmanager.config;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -14,6 +15,7 @@ import java.util.Properties;
 
 @Configuration
 @EnableJpaRepositories(basePackages = "com.cch.cyclingmanager.repository")
+@ComponentScan(basePackages = "com.cch.cyclingmanager")
 @EnableTransactionManagement
 public class JpaConfig {
 
@@ -22,7 +24,7 @@ public class JpaConfig {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(dataSource());
         em.setPackagesToScan("com.cch.cyclingmanager.entity");
-
+        em.setPersistenceUnitName("cch");
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);
         em.setJpaProperties(additionalProperties());
