@@ -23,6 +23,14 @@ public class CyclistServiceImpl implements CyclistService {
     }
 
     @Override
+    public Cyclist update(Cyclist cyclist) {
+        if (cyclist.getId() == null) {
+            throw new IllegalArgumentException("Cannot update a cyclist without an ID");
+        }
+        return cyclistRepository.save(cyclist);
+    }
+
+    @Override
     public Optional<Cyclist> findById(Long id) {
         return cyclistRepository.findById(id);
     }

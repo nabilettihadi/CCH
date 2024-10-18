@@ -24,6 +24,14 @@ public class CompetitionServiceImpl implements CompetitionService {
     }
 
     @Override
+    public Competition update(Competition competition) {
+        if (competition.getId() == null) {
+            throw new IllegalArgumentException("Cannot update a competition without an ID");
+        }
+        return competitionRepository.save(competition);
+    }
+
+    @Override
     public Optional<Competition> findById(Long id) {
         return competitionRepository.findById(id);
     }

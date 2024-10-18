@@ -8,6 +8,7 @@ import java.util.Optional;
 
 public interface CompetitionService {
     Competition save(Competition competition);
+    Competition update(Competition competition);
     Optional<Competition> findById(Long id);
     List<Competition> findAll();
     void delete(Competition competition);

@@ -7,6 +7,7 @@ import java.util.Optional;
 
 public interface CyclistService {
     Cyclist save(Cyclist cyclist);
+    Cyclist update(Cyclist cyclist);
     Optional<Cyclist> findById(Long id);
     List<Cyclist> findAll();
     void delete(Cyclist cyclist);
