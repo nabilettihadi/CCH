@@ -44,7 +44,6 @@ public class CyclistServiceImpl implements CyclistService {
 
     @Override
     public List<Cyclist> findByTeamId(Long teamId) {
-        // Cette méthode nécessite une implémentation dans le repository
         return cyclistRepository.findByTeamId(teamId);
     }
 }
