@@ -9,9 +9,15 @@ import java.io.Serializable;
 @Data
 @Embeddable
 public class GeneralResultId implements Serializable {
-    @NotNull
+    private Long competitionId;
     private Long cyclistId;
 
-    @NotNull
-    private Long competitionId;
+    
+    public GeneralResultId() {}
+
+    
+    public GeneralResultId(Long competitionId, Long cyclistId) {
+        this.competitionId = competitionId;
+        this.cyclistId = cyclistId;
+    }
 }

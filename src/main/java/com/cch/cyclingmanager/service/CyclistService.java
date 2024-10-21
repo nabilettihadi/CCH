@@ -13,4 +13,7 @@ public interface CyclistService {
     void delete(CyclistDto cyclistDto);
     void deleteById(Long id);
     List<CyclistDto> findByTeamId(Long teamId);
+    List<CyclistDto> findAllSortedByName();
+    List<CyclistDto> findAllSortedByNationality();
+    List<CyclistDto> findAllSortedByTeam();
 }

@@ -6,6 +6,7 @@ import com.cch.cyclingmanager.repository.CyclistRepository;
 import com.cch.cyclingmanager.service.CyclistService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,6 +68,27 @@ public class CyclistServiceImpl implements CyclistService {
     @Override
     public List<CyclistDto> findByTeamId(Long teamId) {
         return cyclistRepository.findByTeamId(teamId).stream()
+                .map(cyclist -> modelMapper.map(cyclist, CyclistDto.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CyclistDto> findAllSortedByName() {
+        return cyclistRepository.findAll(Sort.by(Sort.Direction.ASC, "lastName", "firstName")).stream()
+                .map(cyclist -> modelMapper.map(cyclist, CyclistDto.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CyclistDto> findAllSortedByNationality() {
+        return cyclistRepository.findAll(Sort.by(Sort.Direction.ASC, "nationality")).stream()
+                .map(cyclist -> modelMapper.map(cyclist, CyclistDto.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CyclistDto> findAllSortedByTeam() {
+        return cyclistRepository.findAll(Sort.by(Sort.Direction.ASC, "team.name")).stream()
                 .map(cyclist -> modelMapper.map(cyclist, CyclistDto.class))
                 .collect(Collectors.toList());
     }
