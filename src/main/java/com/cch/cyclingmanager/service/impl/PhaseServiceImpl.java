@@ -1,14 +1,17 @@
 package com.cch.cyclingmanager.service.impl;
 
+import com.cch.cyclingmanager.dto.PhaseDto;
 import com.cch.cyclingmanager.entity.Phase;
 import com.cch.cyclingmanager.repository.PhaseRepository;
 import com.cch.cyclingmanager.service.PhaseService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -17,23 +20,32 @@ public class PhaseServiceImpl implements PhaseService {
     @Autowired
     private PhaseRepository phaseRepository;
 
+    @Autowired
+    private ModelMapper modelMapper;
+
     @Override
-    public Phase save(Phase phase) {
-        return phaseRepository.save(phase);
+    public PhaseDto save(PhaseDto phaseDto) {
+        Phase phase = modelMapper.map(phaseDto, Phase.class);
+        phase = phaseRepository.save(phase);
+        return modelMapper.map(phase, PhaseDto.class);
     }
 
     @Override
-    public Optional<Phase> findById(Long id) {
-        return phaseRepository.findById(id);
+    public Optional<PhaseDto> findById(Long id) {
+        return phaseRepository.findById(id)
+                .map(phase -> modelMapper.map(phase, PhaseDto.class));
     }
 
     @Override
-    public List<Phase> findAll() {
-        return phaseRepository.findAll();
+    public List<PhaseDto> findAll() {
+        return phaseRepository.findAll().stream()
+                .map(phase -> modelMapper.map(phase, PhaseDto.class))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public void delete(Phase phase) {
+    public void delete(PhaseDto phaseDto) {
+        Phase phase = modelMapper.map(phaseDto, Phase.class);
         phaseRepository.delete(phase);
     }
 
@@ -43,8 +55,9 @@ public class PhaseServiceImpl implements PhaseService {
     }
 
     @Override
-    public List<Phase> findByCompetitionId(Long competitionId) {
-        // Cette méthode nécessite une implémentation dans le repository
-        return phaseRepository.findByCompetitionId(competitionId);
+    public List<PhaseDto> findByCompetitionId(Long competitionId) {
+        return phaseRepository.findByCompetitionId(competitionId).stream()
+                .map(phase -> modelMapper.map(phase, PhaseDto.class))
+                .collect(Collectors.toList());
     }
 }

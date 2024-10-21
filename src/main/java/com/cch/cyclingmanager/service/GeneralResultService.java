@@ -1,17 +1,17 @@
 package com.cch.cyclingmanager.service;
 
-import com.cch.cyclingmanager.entity.GeneralResult;
+import com.cch.cyclingmanager.dto.GeneralResultDto;
 import com.cch.cyclingmanager.entity.embeddable.GeneralResultId;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface GeneralResultService {
-    GeneralResult save(GeneralResult generalResult);
-    Optional<GeneralResult> findById(GeneralResultId id);
-    List<GeneralResult> findAll();
-    void delete(GeneralResult generalResult);
+    GeneralResultDto save(GeneralResultDto generalResultDto);
+    Optional<GeneralResultDto> findById(GeneralResultId id);
+    List<GeneralResultDto> findAll();
+    void delete(GeneralResultDto generalResultDto);
     void deleteById(GeneralResultId id);
-    List<GeneralResult> findByCompetitionId(Long competitionId);
-    List<GeneralResult> findByCyclistId(Long cyclistId);
+    List<GeneralResultDto> findByCompetitionId(Long competitionId);
+    List<GeneralResultDto> findByCyclistId(Long cyclistId);
 }

@@ -1,15 +1,15 @@
 package com.cch.cyclingmanager.service;
 
-import com.cch.cyclingmanager.entity.Phase;
+import com.cch.cyclingmanager.dto.PhaseDto;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface PhaseService {
-    Phase save(Phase phase);
-    Optional<Phase> findById(Long id);
-    List<Phase> findAll();
-    void delete(Phase phase);
+    PhaseDto save(PhaseDto phaseDto);
+    Optional<PhaseDto> findById(Long id);
+    List<PhaseDto> findAll();
+    void delete(PhaseDto phaseDto);
     void deleteById(Long id);
-    List<Phase> findByCompetitionId(Long competitionId);
+    List<PhaseDto> findByCompetitionId(Long competitionId);
 }

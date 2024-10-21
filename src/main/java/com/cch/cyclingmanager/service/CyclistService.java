@@ -1,16 +1,16 @@
 package com.cch.cyclingmanager.service;
 
-import com.cch.cyclingmanager.entity.Cyclist;
+import com.cch.cyclingmanager.dto.CyclistDto;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface CyclistService {
-    Cyclist save(Cyclist cyclist);
-    Cyclist update(Cyclist cyclist);
-    Optional<Cyclist> findById(Long id);
-    List<Cyclist> findAll();
-    void delete(Cyclist cyclist);
+    CyclistDto save(CyclistDto cyclistDto);
+    CyclistDto update(CyclistDto cyclistDto);
+    Optional<CyclistDto> findById(Long id);
+    List<CyclistDto> findAll();
+    void delete(CyclistDto cyclistDto);
     void deleteById(Long id);
-    List<Cyclist> findByTeamId(Long teamId);
+    List<CyclistDto> findByTeamId(Long teamId);
 }
