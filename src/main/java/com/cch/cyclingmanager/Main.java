@@ -1,7 +1,8 @@
 package com.cch.cyclingmanager;
 
 import com.cch.cyclingmanager.config.JpaConfig;
-import com.cch.cyclingmanager.entity.Competition;
+
+import com.cch.cyclingmanager.dto.CompetitionDto;
 import com.cch.cyclingmanager.service.CompetitionService;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -13,16 +14,16 @@ public class Main {
 
         CompetitionService competitionService = context.getBean(CompetitionService.class);
 
-        Competition competition = new Competition();
-        competition.setName("Tour de France 2023");
-        competition.setStartDate(LocalDate.of(2023, 7, 1));
-        competition.setEndDate(LocalDate.of(2023, 7, 23));
-        competition.setLocation("France");
+        CompetitionDto competitionDto = new CompetitionDto();
+        competitionDto.setName("Tour de France 2023");
+        competitionDto.setStartDate(LocalDate.of(2023, 7, 1));
+        competitionDto.setEndDate(LocalDate.of(2023, 7, 23));
+        competitionDto.setLocation("France");
 
-        competition = competitionService.save(competition);
-        System.out.println("Compétition sauvegardée avec l'ID : " + competition.getId());
+        CompetitionDto savedCompetition = competitionService.save(competitionDto);
+        System.out.println("Compétition sauvegardée avec l'ID : " + savedCompetition.getId());
 
-        Competition retrievedCompetition = competitionService.findById(competition.getId()).orElse(null);
+        CompetitionDto retrievedCompetition = competitionService.findById(savedCompetition.getId()).orElse(null);
         if (retrievedCompetition != null) {
             System.out.println("Compétition récupérée : " + retrievedCompetition.getName());
         }
