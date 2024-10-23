@@ -40,8 +40,13 @@ public class TeamController {
         if (!id.equals(teamDto.getId())) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        TeamDto updatedTeam = teamService.update(teamDto);
-        return new ResponseEntity<>(updatedTeam, HttpStatus.OK);
+        try {
+            TeamDto updatedTeam = teamService.update(teamDto);
+            return new ResponseEntity<>(updatedTeam, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @DeleteMapping("/{id}")

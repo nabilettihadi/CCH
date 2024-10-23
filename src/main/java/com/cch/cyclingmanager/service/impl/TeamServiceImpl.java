@@ -4,6 +4,7 @@ import com.cch.cyclingmanager.dto.TeamDto;
 import com.cch.cyclingmanager.entity.Team;
 import com.cch.cyclingmanager.repository.TeamRepository;
 import com.cch.cyclingmanager.service.TeamService;
+import com.cch.cyclingmanager.entity.Cyclist;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,9 +36,26 @@ public class TeamServiceImpl implements TeamService {
         if (teamDto.getId() == null) {
             throw new IllegalArgumentException("Cannot update a team without an ID");
         }
-        Team team = modelMapper.map(teamDto, Team.class);
-        team = teamRepository.save(team);
-        return modelMapper.map(team, TeamDto.class);
+        return teamRepository.findById(teamDto.getId())
+                .map(existingTeam -> {
+                    // Mise à jour des propriétés simples
+                    existingTeam.setName(teamDto.getName());
+                    existingTeam.setCountry(teamDto.getCountry());
+
+                    // Gestion de la relation avec les cyclistes
+                    if (teamDto.getCyclists() != null) {
+                        existingTeam.getCyclists().clear();
+                        teamDto.getCyclists().forEach(cyclistDto -> {
+                            Cyclist cyclist = modelMapper.map(cyclistDto, Cyclist.class);
+                            cyclist.setTeam(existingTeam);
+                            existingTeam.getCyclists().add(cyclist);
+                        });
+                    }
+
+                    Team updatedTeam = teamRepository.save(existingTeam);
+                    return modelMapper.map(updatedTeam, TeamDto.class);
+                })
+                .orElseThrow(() -> new RuntimeException("Team not found with id: " + teamDto.getId()));
     }
 
     @Override
