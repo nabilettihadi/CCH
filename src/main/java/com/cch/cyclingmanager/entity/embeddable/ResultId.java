@@ -14,4 +14,12 @@ public class ResultId implements Serializable {
 
     @NotNull
     private Long phaseId;
+
+    public ResultId() {
+    }
+
+    public ResultId(Long phaseId, Long cyclistId) {
+        this.phaseId = phaseId;
+        this.cyclistId = cyclistId;
+    }
 }
