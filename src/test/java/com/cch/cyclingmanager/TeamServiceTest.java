@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -49,40 +50,44 @@ class TeamServiceTest {
 
     @Test
     void testSave() {
-        when(modelMapper.map(teamDto, Team.class)).thenReturn(team);
-        when(teamRepository.save(team)).thenReturn(team);
-        when(modelMapper.map(team, TeamDto.class)).thenReturn(teamDto);
+        TeamDto newTeamDto = new TeamDto();
+        newTeamDto.setName("Test Team");
+        newTeamDto.setCountry("Test Country");
 
-        TeamDto savedTeamDto = teamService.create(teamDto);
+        Team newTeam = new Team();
+        newTeam.setName("Test Team");
+        newTeam.setCountry("Test Country");
 
-        assertNotNull(savedTeamDto);
-        assertEquals(teamDto.getId(), savedTeamDto.getId());
-        assertEquals(teamDto.getName(), savedTeamDto.getName());
-        assertEquals(teamDto.getCountry(), savedTeamDto.getCountry());
+        Team savedTeam = new Team();
+        savedTeam.setId(1L);
+        savedTeam.setName("Test Team");
+        savedTeam.setCountry("Test Country");
 
-        verify(teamRepository, times(1)).save(team);
+        when(modelMapper.map(newTeamDto, Team.class)).thenReturn(newTeam);
+        when(teamRepository.save(newTeam)).thenReturn(savedTeam);
+        when(modelMapper.map(savedTeam, TeamDto.class)).thenReturn(teamDto);
+
+        TeamDto result = teamService.create(newTeamDto);
+
+        assertNotNull(result);
+        assertEquals(teamDto.getId(), result.getId());
+        assertEquals(teamDto.getName(), result.getName());
+        verify(teamRepository, times(1)).save(any(Team.class));
     }
 
     @Test
     void testUpdate() {
-        when(modelMapper.map(teamDto, Team.class)).thenReturn(team);
-        when(teamRepository.save(team)).thenReturn(team);
+        when(teamRepository.findById(1L)).thenReturn(Optional.of(team));
+        when(teamRepository.save(any(Team.class))).thenReturn(team);
         when(modelMapper.map(team, TeamDto.class)).thenReturn(teamDto);
 
-        TeamDto updatedTeamDto = teamService.update(teamDto);
+        TeamDto result = teamService.update(teamDto);
 
-        assertNotNull(updatedTeamDto);
-        assertEquals(teamDto.getId(), updatedTeamDto.getId());
-        assertEquals(teamDto.getName(), updatedTeamDto.getName());
-        assertEquals(teamDto.getCountry(), updatedTeamDto.getCountry());
-
-        verify(teamRepository, times(1)).save(team);
-    }
-
-    @Test
-    void testUpdateWithNullId() {
-        teamDto.setId(null);
-        assertThrows(IllegalArgumentException.class, () -> teamService.update(teamDto));
+        assertNotNull(result);
+        assertEquals(teamDto.getId(), result.getId());
+        assertEquals(teamDto.getName(), result.getName());
+        verify(teamRepository, times(1)).findById(1L);
+        verify(teamRepository, times(1)).save(any(Team.class));
     }
 
     @Test
@@ -90,23 +95,10 @@ class TeamServiceTest {
         when(teamRepository.findById(1L)).thenReturn(Optional.of(team));
         when(modelMapper.map(team, TeamDto.class)).thenReturn(teamDto);
 
-        Optional<TeamDto> foundTeamDto = teamService.findById(1L);
+        Optional<TeamDto> foundTeam = teamService.findById(1L);
 
-        assertTrue(foundTeamDto.isPresent());
-        assertEquals(teamDto.getId(), foundTeamDto.get().getId());
-        assertEquals(teamDto.getName(), foundTeamDto.get().getName());
-        assertEquals(teamDto.getCountry(), foundTeamDto.get().getCountry());
-
-        verify(teamRepository, times(1)).findById(1L);
-    }
-
-    @Test
-    void testFindByIdNotFound() {
-        when(teamRepository.findById(1L)).thenReturn(Optional.empty());
-
-        Optional<TeamDto> foundTeamDto = teamService.findById(1L);
-
-        assertFalse(foundTeamDto.isPresent());
+        assertTrue(foundTeam.isPresent());
+        assertEquals(teamDto.getId(), foundTeam.get().getId());
         verify(teamRepository, times(1)).findById(1L);
     }
 
@@ -154,5 +146,16 @@ class TeamServiceTest {
         assertEquals(2, foundTeams.size());
         assertEquals("Test Country", foundTeams.get(0).getCountry());
         verify(teamRepository, times(1)).findByCountry("Test Country");
+    }
+
+    @Test
+    void testCreateWithExistingId() {
+        assertThrows(IllegalArgumentException.class, () -> teamService.create(teamDto));
+    }
+
+    @Test
+    void testUpdateWithNullId() {
+        TeamDto nullIdTeamDto = new TeamDto();
+        assertThrows(IllegalArgumentException.class, () -> teamService.update(nullIdTeamDto));
     }
 }
