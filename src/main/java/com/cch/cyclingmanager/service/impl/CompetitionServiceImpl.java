@@ -25,6 +25,7 @@ public class CompetitionServiceImpl implements CompetitionService {
     private ModelMapper modelMapper;
 
     @Override
+    @Transactional
     public CompetitionDto save(CompetitionDto competitionDto) {
         Competition competition = modelMapper.map(competitionDto, Competition.class);
         competition = competitionRepository.save(competition);

@@ -34,7 +34,7 @@ public class GeneralResultController {
     }
 
     @PostMapping
-    public ResponseEntity<GeneralResultDto> createGeneralResult(@RequestBody GeneralResultDto generalResultDto) {
+    public ResponseEntity<GeneralResultDto> createGeneralResult(@Valid @RequestBody GeneralResultDto generalResultDto) {
         GeneralResultDto createdGeneralResult = generalResultService.save(generalResultDto);
         return new ResponseEntity<>(createdGeneralResult, HttpStatus.CREATED);
     }
