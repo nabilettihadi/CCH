@@ -2,12 +2,14 @@ package com.cch.cyclingmanager.service.impl;
 
 import com.cch.cyclingmanager.dto.PhaseDto;
 import com.cch.cyclingmanager.dto.ResultDto;
+import com.cch.cyclingmanager.entity.Phase;
 import com.cch.cyclingmanager.entity.Result;
 import com.cch.cyclingmanager.entity.embeddable.ResultId;
 import com.cch.cyclingmanager.repository.ResultRepository;
 import com.cch.cyclingmanager.service.GeneralResultService;
 import com.cch.cyclingmanager.service.PhaseService;
 import com.cch.cyclingmanager.service.ResultService;
+import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,14 +33,44 @@ public class ResultServiceImpl implements ResultService {
 
     @Autowired
     private GeneralResultService generalResultService;
+
     @Autowired
     private ModelMapper modelMapper;
 
     @Override
-    public ResultDto save(ResultDto resultDto) {
+    public ResultDto create(ResultDto resultDto) {
+        if (resultDto.getPhaseId() == null) {
+            throw new IllegalArgumentException("PhaseId cannot be null");
+        }
+
         Result result = modelMapper.map(resultDto, Result.class);
+
+        Phase phase = phaseService.findById(resultDto.getPhaseId())
+                .map(phaseDto -> modelMapper.map(phaseDto, Phase.class))
+                .orElseThrow(() -> new EntityNotFoundException("Phase not found with id: " + resultDto.getPhaseId()));
+        result.setPhase(phase);
+
         result = resultRepository.save(result);
+        calculateRankings(resultDto.getPhaseId());
         return modelMapper.map(result, ResultDto.class);
+    }
+
+    @Override
+    public ResultDto update(ResultDto resultDto) {
+        if (resultDto.getPhaseId() == null || resultDto.getCyclistId() == null) {
+            throw new IllegalArgumentException("PhaseId and CyclistId cannot be null");
+        }
+
+        ResultId id = new ResultId(resultDto.getPhaseId(), resultDto.getCyclistId());
+        Result existingResult = resultRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Result not found"));
+
+        existingResult.setTime(resultDto.getTime());
+        existingResult.setPosition(resultDto.getRank());
+
+        Result updatedResult = resultRepository.save(existingResult);
+        calculateRankings(resultDto.getPhaseId());
+        return modelMapper.map(updatedResult, ResultDto.class);
     }
 
     @Override
@@ -52,12 +84,6 @@ public class ResultServiceImpl implements ResultService {
         return resultRepository.findAll().stream()
                 .map(result -> modelMapper.map(result, ResultDto.class))
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    public void delete(ResultDto resultDto) {
-        Result result = modelMapper.map(resultDto, Result.class);
-        resultRepository.delete(result);
     }
 
     @Override
@@ -80,17 +106,6 @@ public class ResultServiceImpl implements ResultService {
     }
 
     @Override
-    public ResultDto saveResult(Long cyclistId, Long phaseId, Duration time) {
-        ResultDto resultDto = new ResultDto();
-        resultDto.setCyclistId(cyclistId);
-        resultDto.setPhaseId(phaseId);
-        resultDto.setTime(time);
-        ResultDto savedResult = save(resultDto);
-        calculateRankings(phaseId);
-        return savedResult;
-    }
-
-    @Override
     public List<ResultDto> getResultsForCompetition(Long competitionId) {
         List<Long> phaseIds = phaseService.findByCompetitionId(competitionId)
                 .stream()
@@ -108,7 +123,7 @@ public class ResultServiceImpl implements ResultService {
         for (int i = 0; i < results.size(); i++) {
             ResultDto result = results.get(i);
             result.setRank(i + 1);
-            save(result);
+            update(result);
         }
         updateGeneralResults(phaseId);
     }

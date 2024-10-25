@@ -8,14 +8,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ResultService {
-    ResultDto save(ResultDto resultDto);
+    ResultDto create(ResultDto resultDto);
+    ResultDto update(ResultDto resultDto);
     Optional<ResultDto> findById(ResultId id);
     List<ResultDto> findAll();
-    void delete(ResultDto resultDto);
     void deleteById(ResultId id);
     List<ResultDto> findByPhaseId(Long phaseId);
     List<ResultDto> findByCyclistId(Long cyclistId);
-    ResultDto saveResult(Long cyclistId, Long phaseId, Duration time);
     List<ResultDto> getResultsForCompetition(Long competitionId);
     void calculateRankings(Long phaseId);
 }

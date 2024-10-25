@@ -23,26 +23,41 @@ public class ResultController {
         return new ResponseEntity<>(results, HttpStatus.OK);
     }
 
-    @GetMapping("/{stageId}/{cyclistId}")
+    @GetMapping("/{phaseId}/{cyclistId}")
     public ResponseEntity<ResultDto> getResultById(
-            @PathVariable Long stageId,
+            @PathVariable Long phaseId,
             @PathVariable Long cyclistId) {
-        return resultService.findById(new ResultId(stageId, cyclistId))
+        return resultService.findById(new ResultId(phaseId, cyclistId))
                 .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @PostMapping
     public ResponseEntity<ResultDto> createResult(@RequestBody ResultDto resultDto) {
-        ResultDto createdResult = resultService.save(resultDto);
+        if (resultDto.getPhaseId() == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        ResultDto createdResult = resultService.create(resultDto);
         return new ResponseEntity<>(createdResult, HttpStatus.CREATED);
     }
+    
+    @PutMapping("/{phaseId}/{cyclistId}")
+    public ResponseEntity<ResultDto> updateResult(
+            @PathVariable Long phaseId,
+            @PathVariable Long cyclistId,
+            @RequestBody ResultDto resultDto) {
+        if (!phaseId.equals(resultDto.getPhaseId()) || !cyclistId.equals(resultDto.getCyclistId())) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        ResultDto updatedResult = resultService.update(resultDto);
+        return new ResponseEntity<>(updatedResult, HttpStatus.OK);
+    }
 
-    @DeleteMapping("/{stageId}/{cyclistId}")
+    @DeleteMapping("/{phaseId}/{cyclistId}")
     public ResponseEntity<Void> deleteResult(
-            @PathVariable Long stageId,
+            @PathVariable Long phaseId,
             @PathVariable Long cyclistId) {
-        resultService.deleteById(new ResultId(stageId, cyclistId));
+        resultService.deleteById(new ResultId(phaseId, cyclistId));
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
