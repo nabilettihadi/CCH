@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TeamService {
-    TeamDto save(TeamDto teamDto);
+    TeamDto create(TeamDto teamDto);
     TeamDto update(TeamDto teamDto);
     Optional<TeamDto> findById(Long id);
     List<TeamDto> findAll();

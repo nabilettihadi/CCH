@@ -25,7 +25,10 @@ public class TeamServiceImpl implements TeamService {
     private ModelMapper modelMapper;
 
     @Override
-    public TeamDto save(TeamDto teamDto) {
+    public TeamDto create(TeamDto teamDto) {
+        if (teamDto.getId() != null) {
+            throw new IllegalArgumentException("A new team cannot already have an ID");
+        }
         Team team = modelMapper.map(teamDto, Team.class);
         team = teamRepository.save(team);
         return modelMapper.map(team, TeamDto.class);

@@ -26,4 +26,9 @@ public class CompetitionDto {
     private String location;
 
     private Set<PhaseDto> phases;
+
+    @AssertTrue(message = "La date de fin doit être postérieure à la date de début")
+    private boolean isEndDateAfterStartDate() {
+        return endDate == null || startDate == null || endDate.isAfter(startDate);
+    }
 }

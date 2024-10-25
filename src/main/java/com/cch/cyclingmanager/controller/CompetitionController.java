@@ -2,6 +2,9 @@ package com.cch.cyclingmanager.controller;
 
 import com.cch.cyclingmanager.dto.CompetitionDto;
 import com.cch.cyclingmanager.service.CompetitionService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -32,13 +35,13 @@ public class CompetitionController {
     }
 
     @PostMapping
-    public ResponseEntity<CompetitionDto> createCompetition(@RequestBody CompetitionDto competitionDto) {
+    public ResponseEntity<CompetitionDto> createCompetition(@Valid @RequestBody CompetitionDto competitionDto) {
         CompetitionDto createdCompetition = competitionService.save(competitionDto);
         return new ResponseEntity<>(createdCompetition, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CompetitionDto> updateCompetition(@PathVariable Long id, @RequestBody CompetitionDto competitionDto) {
+    public ResponseEntity<CompetitionDto> updateCompetition(@Valid @PathVariable Long id, @RequestBody CompetitionDto competitionDto) {
         if (!id.equals(competitionDto.getId())) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

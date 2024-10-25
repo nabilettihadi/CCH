@@ -53,7 +53,7 @@ class TeamServiceTest {
         when(teamRepository.save(team)).thenReturn(team);
         when(modelMapper.map(team, TeamDto.class)).thenReturn(teamDto);
 
-        TeamDto savedTeamDto = teamService.save(teamDto);
+        TeamDto savedTeamDto = teamService.create(teamDto);
 
         assertNotNull(savedTeamDto);
         assertEquals(teamDto.getId(), savedTeamDto.getId());

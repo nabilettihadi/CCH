@@ -3,6 +3,7 @@ package com.cch.cyclingmanager.controller;
 import com.cch.cyclingmanager.dto.GeneralResultDto;
 import com.cch.cyclingmanager.entity.embeddable.GeneralResultId;
 import com.cch.cyclingmanager.service.GeneralResultService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,7 +40,7 @@ public class GeneralResultController {
     }
 
     @PutMapping("/{competitionId}/{cyclistId}")
-    public ResponseEntity<GeneralResultDto> updateGeneralResult(
+    public ResponseEntity<GeneralResultDto> updateGeneralResult(@Valid
             @PathVariable Long competitionId,
             @PathVariable Long cyclistId,
             @RequestBody GeneralResultDto generalResultDto) {
