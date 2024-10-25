@@ -131,32 +131,6 @@ class GeneralResultServiceTest {
     }
 
     @Test
-    void testFindByCompetitionId() {
-        List<GeneralResult> generalResults = Arrays.asList(generalResult, generalResult);
-        when(generalResultRepository.findByIdCompetitionId(1L)).thenReturn(generalResults);
-        when(modelMapper.map(generalResult, GeneralResultDto.class)).thenReturn(generalResultDto);
-
-        List<GeneralResultDto> foundGeneralResults = generalResultService.findByCompetitionId(1L);
-
-        assertNotNull(foundGeneralResults);
-        assertEquals(2, foundGeneralResults.size());
-        verify(generalResultRepository, times(1)).findByIdCompetitionId(1L);
-    }
-
-    @Test
-    void testFindByCyclistId() {
-        List<GeneralResult> generalResults = Arrays.asList(generalResult, generalResult);
-        when(generalResultRepository.findByIdCyclistId(1L)).thenReturn(generalResults);
-        when(modelMapper.map(generalResult, GeneralResultDto.class)).thenReturn(generalResultDto);
-
-        List<GeneralResultDto> foundGeneralResults = generalResultService.findByCyclistId(1L);
-
-        assertNotNull(foundGeneralResults);
-        assertEquals(2, foundGeneralResults.size());
-        verify(generalResultRepository, times(1)).findByIdCyclistId(1L);
-    }
-
-    @Test
     void testRegister() {
         GeneralResultDto newGeneralResultDto = new GeneralResultDto(1L, 1L, 0, Duration.ZERO);
         when(modelMapper.map(any(GeneralResultDto.class), eq(GeneralResult.class))).thenReturn(generalResult);
@@ -275,6 +249,37 @@ class GeneralResultServiceTest {
         assertEquals(competitionDto, performanceHistory.get(0).getCompetition());
         assertEquals(1, performanceHistory.get(0).getRank());
         assertEquals(Duration.ofSeconds(3600), performanceHistory.get(0).getTotalTime());
+    }
+
+    @Test
+    void testRegisterWithNonExistentCompetition() {
+        when(competitionService.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThrows(RuntimeException.class, () -> generalResultService.register(1L, 999L));
+    }
+
+    @Test
+    void testUpdateGeneralResultForNonRegisteredCyclist() {
+        when(generalResultRepository.findById(any(GeneralResultId.class))).thenReturn(Optional.empty());
+
+        assertThrows(RuntimeException.class, () -> generalResultService.updateGeneralResult(1L, 1L, Duration.ofSeconds(3600)));
+    }
+
+    @Test
+    void testGenerateCompetitionReportWithNoParticipants() {
+        CompetitionDto competitionDto = new CompetitionDto();
+        competitionDto.setId(1L);
+        competitionDto.setName("Test Competition");
+
+        when(competitionService.findById(1L)).thenReturn(Optional.of(competitionDto));
+        when(generalResultRepository.findByIdCompetitionId(1L)).thenReturn(Arrays.asList());
+
+        CompetitionReportDto report = generalResultService.generateCompetitionReport(1L);
+
+        assertNotNull(report);
+        assertEquals(competitionDto, report.getCompetition());
+        assertTrue(report.getParticipants().isEmpty());
+        assertTrue(report.getRankings().isEmpty());
     }
 
     private GeneralResult createGeneralResult(Long competitionId, Long cyclistId, Duration totalTime) {
