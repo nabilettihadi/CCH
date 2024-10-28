@@ -17,6 +17,7 @@ public class GeneralResultController {
 
     @Autowired
     private GeneralResultService generalResultService;
+
     @GetMapping
     public ResponseEntity<List<GeneralResultDto>> getAllGeneralResults() {
         List<GeneralResultDto> generalResults = generalResultService.findAll();
@@ -40,9 +41,9 @@ public class GeneralResultController {
 
     @PutMapping("/{competitionId}/{cyclistId}")
     public ResponseEntity<GeneralResultDto> updateGeneralResult(@Valid
-            @PathVariable Long competitionId,
-            @PathVariable Long cyclistId,
-            @RequestBody GeneralResultDto generalResultDto) {
+                                                                @PathVariable Long competitionId,
+                                                                @PathVariable Long cyclistId,
+                                                                @RequestBody GeneralResultDto generalResultDto) {
         if (!competitionId.equals(generalResultDto.getCompetitionId()) ||
                 !cyclistId.equals(generalResultDto.getCyclistId())) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

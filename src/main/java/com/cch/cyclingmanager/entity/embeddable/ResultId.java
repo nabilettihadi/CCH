@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import jakarta.persistence.Embeddable;
+
 import java.io.Serializable;
 
 @Data

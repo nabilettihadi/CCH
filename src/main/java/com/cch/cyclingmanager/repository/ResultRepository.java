@@ -8,5 +8,6 @@ import java.util.List;
 
 public interface ResultRepository extends JpaRepository<Result, ResultId> {
     List<Result> findByPhaseId(Long phaseId);
+
     List<Result> findByCyclistId(Long cyclistId);
 }

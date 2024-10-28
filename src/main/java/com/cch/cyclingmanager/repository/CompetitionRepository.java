@@ -8,5 +8,6 @@ import java.util.List;
 
 public interface CompetitionRepository extends JpaRepository<Competition, Long> {
     List<Competition> findByLocation(String location);
+
     List<Competition> findByStartDateBetween(LocalDate startDate, LocalDate endDate);
 }

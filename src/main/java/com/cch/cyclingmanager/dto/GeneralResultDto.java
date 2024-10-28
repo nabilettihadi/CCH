@@ -3,6 +3,7 @@ package com.cch.cyclingmanager.dto;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
+
 import java.time.Duration;
 
 @Data
@@ -19,7 +20,8 @@ public class GeneralResultDto {
     @NotNull
     private Duration totalTime;
 
-    public GeneralResultDto() {}
+    public GeneralResultDto() {
+    }
 
     public GeneralResultDto(Long competitionId, Long cyclistId, int rank, Duration totalTime) {
         this.competitionId = competitionId;

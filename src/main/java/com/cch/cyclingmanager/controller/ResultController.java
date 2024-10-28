@@ -40,7 +40,7 @@ public class ResultController {
         ResultDto createdResult = resultService.create(resultDto);
         return new ResponseEntity<>(createdResult, HttpStatus.CREATED);
     }
-    
+
     @PutMapping("/{phaseId}/{cyclistId}")
     public ResponseEntity<ResultDto> updateResult(
             @PathVariable Long phaseId,

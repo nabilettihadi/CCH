@@ -9,12 +9,20 @@ import java.util.Optional;
 
 public interface ResultService {
     ResultDto create(ResultDto resultDto);
+
     ResultDto update(ResultDto resultDto);
+
     Optional<ResultDto> findById(ResultId id);
+
     List<ResultDto> findAll();
+
     void deleteById(ResultId id);
+
     List<ResultDto> findByPhaseId(Long phaseId);
+
     List<ResultDto> findByCyclistId(Long cyclistId);
+
     List<ResultDto> getResultsForCompetition(Long competitionId);
+
     void calculateRankings(Long phaseId);
 }

@@ -75,6 +75,7 @@ public class ResultServiceImpl implements ResultService {
             throw new IllegalArgumentException("Le rang ne peut pas être négatif");
         }
     }
+
     @Override
     public Optional<ResultDto> findById(ResultId id) {
         if (id == null) {

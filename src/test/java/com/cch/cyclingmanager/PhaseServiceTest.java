@@ -6,6 +6,7 @@ import com.cch.cyclingmanager.entity.Result;
 import com.cch.cyclingmanager.entity.Cyclist;
 import com.cch.cyclingmanager.entity.embeddable.ResultId;
 import org.junit.jupiter.api.Test;
+
 import java.time.LocalDate;
 import java.time.Duration;
 import java.util.HashSet;

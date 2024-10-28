@@ -7,9 +7,14 @@ import java.util.Optional;
 
 public interface PhaseService {
     PhaseDto save(PhaseDto phaseDto);
+
     Optional<PhaseDto> findById(Long id);
+
     List<PhaseDto> findAll();
+
     void delete(PhaseDto phaseDto);
+
     void deleteById(Long id);
+
     List<PhaseDto> findByCompetitionId(Long competitionId);
 }

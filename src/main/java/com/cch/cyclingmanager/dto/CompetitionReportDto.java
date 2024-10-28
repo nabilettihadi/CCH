@@ -1,11 +1,13 @@
 package com.cch.cyclingmanager.dto;
 
 import lombok.Data;
+
 import java.util.List;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.NotNull;
+
 @Data
 public class CompetitionReportDto {
     @NotNull

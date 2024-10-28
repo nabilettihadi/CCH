@@ -3,6 +3,7 @@ package com.cch.cyclingmanager.entity;
 import lombok.Data;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+
 import java.time.LocalDate;
 import java.util.Set;
 
