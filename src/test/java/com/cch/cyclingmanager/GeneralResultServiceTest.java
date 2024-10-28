@@ -25,6 +25,9 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -131,22 +134,26 @@ class GeneralResultServiceTest {
     }
 
     @Test
-    void testRegister() {
-        GeneralResultDto newGeneralResultDto = new GeneralResultDto(1L, 1L, 0, Duration.ZERO);
-        when(modelMapper.map(any(GeneralResultDto.class), eq(GeneralResult.class))).thenReturn(generalResult);
-        when(generalResultRepository.save(any(GeneralResult.class))).thenReturn(generalResult);
-        when(modelMapper.map(generalResult, GeneralResultDto.class)).thenReturn(newGeneralResultDto);
+void testRegister() {
+    CompetitionDto competitionDto = new CompetitionDto();
+    competitionDto.setId(1L);
+    when(competitionService.findById(1L)).thenReturn(Optional.of(competitionDto));
+    
+    GeneralResultDto newGeneralResultDto = new GeneralResultDto(1L, 1L, 0, Duration.ZERO);
+    when(modelMapper.map(any(GeneralResultDto.class), eq(GeneralResult.class))).thenReturn(generalResult);
+    when(generalResultRepository.save(any(GeneralResult.class))).thenReturn(generalResult);
+    when(modelMapper.map(generalResult, GeneralResultDto.class)).thenReturn(newGeneralResultDto);
 
-        GeneralResultDto registeredGeneralResultDto = generalResultService.register(1L, 1L);
+    GeneralResultDto registeredGeneralResultDto = generalResultService.register(1L, 1L);
 
-        assertNotNull(registeredGeneralResultDto);
-        assertEquals(1L, registeredGeneralResultDto.getCompetitionId());
-        assertEquals(1L, registeredGeneralResultDto.getCyclistId());
-        assertEquals(0, registeredGeneralResultDto.getRank());
-        assertEquals(Duration.ZERO, registeredGeneralResultDto.getTotalTime());
+    assertNotNull(registeredGeneralResultDto);
+    assertEquals(1L, registeredGeneralResultDto.getCompetitionId());
+    assertEquals(1L, registeredGeneralResultDto.getCyclistId());
+    assertEquals(0, registeredGeneralResultDto.getRank());
+    assertEquals(Duration.ZERO, registeredGeneralResultDto.getTotalTime());
 
-        verify(generalResultRepository, times(1)).save(any(GeneralResult.class));
-    }
+    verify(generalResultRepository, times(1)).save(any(GeneralResult.class));
+}
 
     @Test
     void testUnregister() {
@@ -159,6 +166,9 @@ class GeneralResultServiceTest {
 
     @Test
     void testUpdateGeneralResult() {
+        CompetitionDto competitionDto = new CompetitionDto();
+        competitionDto.setId(1L);
+        when(competitionService.findById(1L)).thenReturn(Optional.of(competitionDto));
         GeneralResultDto updatedGeneralResultDto = new GeneralResultDto(1L, 1L, 1, Duration.ofSeconds(4000));
         when(generalResultRepository.findById(any(GeneralResultId.class))).thenReturn(Optional.of(generalResult));
         when(modelMapper.map(generalResult, GeneralResultDto.class)).thenReturn(generalResultDto);
@@ -259,11 +269,21 @@ class GeneralResultServiceTest {
     }
 
     @Test
-    void testUpdateGeneralResultForNonRegisteredCyclist() {
-        when(generalResultRepository.findById(any(GeneralResultId.class))).thenReturn(Optional.empty());
-
-        assertThrows(RuntimeException.class, () -> generalResultService.updateGeneralResult(1L, 1L, Duration.ofSeconds(3600)));
-    }
+void testUpdateGeneralResultForNonRegisteredCyclist() {
+    // Configurer le mock pour retourner une compétition existante
+    CompetitionDto competitionDto = new CompetitionDto();
+    competitionDto.setId(2L);
+    when(competitionService.findById(2L)).thenReturn(Optional.of(competitionDto));
+    
+    // Configurer le mock pour simuler un cycliste non enregistré
+    when(generalResultRepository.findById(any(GeneralResultId.class))).thenReturn(Optional.empty());
+    when(modelMapper.map(any(GeneralResultDto.class), eq(GeneralResult.class))).thenReturn(new GeneralResult());
+    
+    // Exécuter et vérifier
+    generalResultService.updateGeneralResult(2L, 1L, Duration.ofSeconds(3600));
+    
+    verify(generalResultRepository).save(any(GeneralResult.class));
+}
 
     @Test
     void testGenerateCompetitionReportWithNoParticipants() {

@@ -57,23 +57,29 @@ public class ResultServiceImpl implements ResultService {
     @Override
     public ResultDto update(ResultDto resultDto) {
         if (resultDto.getPhaseId() == null || resultDto.getCyclistId() == null) {
-            throw new IllegalArgumentException("PhaseId and CyclistId cannot be null");
+            throw new IllegalArgumentException("Les IDs ne peuvent pas être nuls");
         }
-
-        ResultId id = new ResultId(resultDto.getPhaseId(), resultDto.getCyclistId());
-        Result existingResult = resultRepository.findById(id)
+        validateResult(resultDto);
+        Result result = resultRepository.findById(new ResultId(resultDto.getPhaseId(), resultDto.getCyclistId()))
                 .orElseThrow(() -> new EntityNotFoundException("Result not found"));
-
-        existingResult.setTime(resultDto.getTime());
-        existingResult.setPosition(resultDto.getRank());
-
-        Result updatedResult = resultRepository.save(existingResult);
-        calculateRankings(resultDto.getPhaseId());
-        return modelMapper.map(updatedResult, ResultDto.class);
+        result = modelMapper.map(resultDto, Result.class);
+        result = resultRepository.save(result);
+        return modelMapper.map(result, ResultDto.class);
     }
 
+    private void validateResult(ResultDto resultDto) {
+        if (resultDto.getTime().isNegative()) {
+            throw new IllegalArgumentException("Le temps ne peut pas être négatif");
+        }
+        if (resultDto.getRank() < 0) {
+            throw new IllegalArgumentException("Le rang ne peut pas être négatif");
+        }
+    }
     @Override
     public Optional<ResultDto> findById(ResultId id) {
+        if (id == null) {
+            throw new IllegalArgumentException("L'ID ne peut pas être null");
+        }
         return resultRepository.findById(id)
                 .map(result -> modelMapper.map(result, ResultDto.class));
     }
@@ -87,11 +93,17 @@ public class ResultServiceImpl implements ResultService {
 
     @Override
     public void deleteById(ResultId id) {
+        if (id == null) {
+            throw new IllegalArgumentException("L'ID ne peut pas être null");
+        }
         resultRepository.deleteById(id);
     }
 
     @Override
     public List<ResultDto> findByPhaseId(Long phaseId) {
+        if (phaseId == null) {
+            throw new IllegalArgumentException("L'ID de la phase ne peut pas être null");
+        }
         return resultRepository.findByPhaseId(phaseId).stream()
                 .map(result -> modelMapper.map(result, ResultDto.class))
                 .collect(Collectors.toList());
@@ -99,6 +111,9 @@ public class ResultServiceImpl implements ResultService {
 
     @Override
     public List<ResultDto> findByCyclistId(Long cyclistId) {
+        if (cyclistId == null) {
+            throw new IllegalArgumentException("L'ID du cycliste ne peut pas être null");
+        }
         return resultRepository.findByCyclistId(cyclistId).stream()
                 .map(result -> modelMapper.map(result, ResultDto.class))
                 .collect(Collectors.toList());

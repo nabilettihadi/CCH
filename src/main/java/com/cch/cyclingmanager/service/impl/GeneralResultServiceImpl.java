@@ -82,14 +82,13 @@ public class GeneralResultServiceImpl implements GeneralResultService {
     }
 
     @Override
-    public GeneralResultDto register(Long cyclistId, Long competitionId) {
-        GeneralResultDto generalResultDto = new GeneralResultDto();
-        generalResultDto.setCyclistId(cyclistId);
-        generalResultDto.setCompetitionId(competitionId);
-        generalResultDto.setRank(0);
-        generalResultDto.setTotalTime(Duration.ZERO);
-        return save(generalResultDto);
-    }
+public GeneralResultDto register(Long competitionId, Long cyclistId) {
+    CompetitionDto competition = competitionService.findById(competitionId)
+        .orElseThrow(() -> new RuntimeException("Competition not found"));
+        
+    GeneralResultDto dto = new GeneralResultDto(competitionId, cyclistId, 0, Duration.ZERO);
+    return save(dto);
+}
 
     @Override
     public void unregister(Long cyclistId, Long competitionId) {
@@ -104,6 +103,9 @@ public class GeneralResultServiceImpl implements GeneralResultService {
 
     @Override
     public void updateGeneralResult(Long competitionId, Long cyclistId, Duration time) {
+        if (!competitionService.findById(competitionId).isPresent()) {
+            throw new RuntimeException("Competition not found");
+        }
         GeneralResultId id = new GeneralResultId(competitionId, cyclistId);
         GeneralResultDto generalResult = findById(id).orElse(new GeneralResultDto(competitionId, cyclistId, 0, Duration.ZERO));
         generalResult.setTotalTime(generalResult.getTotalTime().plus(time));
