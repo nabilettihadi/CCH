@@ -134,26 +134,26 @@ class GeneralResultServiceTest {
     }
 
     @Test
-void testRegister() {
-    CompetitionDto competitionDto = new CompetitionDto();
-    competitionDto.setId(1L);
-    when(competitionService.findById(1L)).thenReturn(Optional.of(competitionDto));
-    
-    GeneralResultDto newGeneralResultDto = new GeneralResultDto(1L, 1L, 0, Duration.ZERO);
-    when(modelMapper.map(any(GeneralResultDto.class), eq(GeneralResult.class))).thenReturn(generalResult);
-    when(generalResultRepository.save(any(GeneralResult.class))).thenReturn(generalResult);
-    when(modelMapper.map(generalResult, GeneralResultDto.class)).thenReturn(newGeneralResultDto);
+    void testRegister() {
+        CompetitionDto competitionDto = new CompetitionDto();
+        competitionDto.setId(1L);
+        when(competitionService.findById(1L)).thenReturn(Optional.of(competitionDto));
 
-    GeneralResultDto registeredGeneralResultDto = generalResultService.register(1L, 1L);
+        GeneralResultDto newGeneralResultDto = new GeneralResultDto(1L, 1L, 0, Duration.ZERO);
+        when(modelMapper.map(any(GeneralResultDto.class), eq(GeneralResult.class))).thenReturn(generalResult);
+        when(generalResultRepository.save(any(GeneralResult.class))).thenReturn(generalResult);
+        when(modelMapper.map(generalResult, GeneralResultDto.class)).thenReturn(newGeneralResultDto);
 
-    assertNotNull(registeredGeneralResultDto);
-    assertEquals(1L, registeredGeneralResultDto.getCompetitionId());
-    assertEquals(1L, registeredGeneralResultDto.getCyclistId());
-    assertEquals(0, registeredGeneralResultDto.getRank());
-    assertEquals(Duration.ZERO, registeredGeneralResultDto.getTotalTime());
+        GeneralResultDto registeredGeneralResultDto = generalResultService.register(1L, 1L);
 
-    verify(generalResultRepository, times(1)).save(any(GeneralResult.class));
-}
+        assertNotNull(registeredGeneralResultDto);
+        assertEquals(1L, registeredGeneralResultDto.getCompetitionId());
+        assertEquals(1L, registeredGeneralResultDto.getCyclistId());
+        assertEquals(0, registeredGeneralResultDto.getRank());
+        assertEquals(Duration.ZERO, registeredGeneralResultDto.getTotalTime());
+
+        verify(generalResultRepository, times(1)).save(any(GeneralResult.class));
+    }
 
     @Test
     void testUnregister() {
@@ -269,21 +269,18 @@ void testRegister() {
     }
 
     @Test
-void testUpdateGeneralResultForNonRegisteredCyclist() {
-    // Configurer le mock pour retourner une compétition existante
-    CompetitionDto competitionDto = new CompetitionDto();
-    competitionDto.setId(2L);
-    when(competitionService.findById(2L)).thenReturn(Optional.of(competitionDto));
-    
-    // Configurer le mock pour simuler un cycliste non enregistré
-    when(generalResultRepository.findById(any(GeneralResultId.class))).thenReturn(Optional.empty());
-    when(modelMapper.map(any(GeneralResultDto.class), eq(GeneralResult.class))).thenReturn(new GeneralResult());
-    
-    // Exécuter et vérifier
-    generalResultService.updateGeneralResult(2L, 1L, Duration.ofSeconds(3600));
-    
-    verify(generalResultRepository).save(any(GeneralResult.class));
-}
+    void testUpdateGeneralResultForNonRegisteredCyclist() {
+        CompetitionDto competitionDto = new CompetitionDto();
+        competitionDto.setId(2L);
+        when(competitionService.findById(2L)).thenReturn(Optional.of(competitionDto));
+
+        when(generalResultRepository.findById(any(GeneralResultId.class))).thenReturn(Optional.empty());
+        when(modelMapper.map(any(GeneralResultDto.class), eq(GeneralResult.class))).thenReturn(new GeneralResult());
+
+        generalResultService.updateGeneralResult(2L, 1L, Duration.ofSeconds(3600));
+
+        verify(generalResultRepository).save(any(GeneralResult.class));
+    }
 
     @Test
     void testGenerateCompetitionReportWithNoParticipants() {

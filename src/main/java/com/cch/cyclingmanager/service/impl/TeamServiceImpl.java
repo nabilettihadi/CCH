@@ -41,11 +41,8 @@ public class TeamServiceImpl implements TeamService {
         }
         return teamRepository.findById(teamDto.getId())
                 .map(existingTeam -> {
-                    // Mise à jour des propriétés simples
                     existingTeam.setName(teamDto.getName());
                     existingTeam.setCountry(teamDto.getCountry());
-
-                    // Gestion de la relation avec les cyclistes
                     if (teamDto.getCyclists() != null) {
                         existingTeam.getCyclists().clear();
                         teamDto.getCyclists().forEach(cyclistDto -> {

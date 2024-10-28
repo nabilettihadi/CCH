@@ -9,7 +9,10 @@ import java.io.Serializable;
 @Data
 @Embeddable
 public class GeneralResultId implements Serializable {
+    @NotNull
     private Long competitionId;
+    
+    @NotNull
     private Long cyclistId;
 
     

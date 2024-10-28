@@ -132,6 +132,9 @@
                 <configuration>
                     <source>22</source>
                     <target>22</target>
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
             <plugin>
