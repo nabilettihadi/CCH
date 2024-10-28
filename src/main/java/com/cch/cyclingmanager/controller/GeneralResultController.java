@@ -17,7 +17,6 @@ public class GeneralResultController {
 
     @Autowired
     private GeneralResultService generalResultService;
-
     @GetMapping
     public ResponseEntity<List<GeneralResultDto>> getAllGeneralResults() {
         List<GeneralResultDto> generalResults = generalResultService.findAll();
