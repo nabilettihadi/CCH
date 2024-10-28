@@ -1,34 +1,51 @@
-# CCH (Cyclo Club Horizon) - API de Gestion des Compétitions Cyclistes
+<div align="center">
+  <h1>🚴‍♂️ CCH (Cyclo Club Horizon) API</h1>
+  <p>API REST pour la gestion des compétitions cyclistes</p>
+</div>
 
-## Description
+## 🌟 À propos
 
 Application Java pour la gestion des courses contre la montre de cyclisme, utilisant Spring MVC et déployée sur Tomcat.
 Cette API REST permet la gestion des compétitions cyclistes individuelles, où chaque coureur concourt pour réaliser le
 meilleur temps sur un parcours donné.
 
-## Technologies
+## 👨‍💻 Développeur
 
-- Java 22
-- Spring MVC 6.1
-- Spring Data JPA 3.3
-- Hibernate ORM 6.4
-- PostgreSQL
-- HikariCP 6.0
-- ModelMapper 3.1
-- JUnit 5 & Mockito
-- Jakarta EE 9.1
-- Lombok
+<div align="center">
+  <img src="https://avatars.githubusercontent.com/nabilettihadi" width="100px" style="border-radius:50%"/>
+  <h3>Nabil Ettihadi</h3>
+  <p>Full-Stack Developer</p>
 
-## Fonctionnalités
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue)](https://linkedin.com/in/nabil-ettihadi)
+[![Email](https://img.shields.io/badge/Email-Contact-red)](mailto:nettihadi@gmail.com)
+</div>
 
-### 1. Gestion des Compétitions
+## 📋 Table des matières
 
-- CRUD complet des compétitions avec validation
-- Gestion des dates de début et fin
-- Localisation des compétitions
-- Gestion des phases
+- [À propos](#-à-propos)
+- [Développeur](#-développeur)
+- [Technologies](#️-technologies)
+- [Fonctionnalités](#-fonctionnalités)
+- [API Endpoints](#-api-endpoints)
+- [Installation](#-installation)
+- [Tests](#-tests)
+- [Architecture](#-architecture)
+- [Contribution](#-contribution)
 
-## Fonctionnalités
+## 🛠️ Technologies
+
+![Java](https://img.shields.io/badge/Java-22-orange)
+![Spring MVC](https://img.shields.io/badge/Spring%20MVC-6.1-green)
+![Spring Data JPA](https://img.shields.io/badge/Spring%20Data%20JPA-3.3-lightgreen)
+![Hibernate](https://img.shields.io/badge/Hibernate-6.4-yellow)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Latest-blue)
+![HikariCP](https://img.shields.io/badge/HikariCP-6.0-purple)
+![ModelMapper](https://img.shields.io/badge/ModelMapper-3.1-red)
+![JUnit](https://img.shields.io/badge/JUnit-5-brightgreen)
+![Jakarta EE](https://img.shields.io/badge/Jakarta%20EE-9.1-blue)
+![Lombok](https://img.shields.io/badge/Lombok-Latest-blueviolet)
+
+## 📝 Fonctionnalités
 
 ### 1. Gestion des Équipes (Teams)
 
@@ -59,9 +76,9 @@ meilleur temps sur un parcours donné.
 - Génération de rapports de compétition
 - Historique des performances des coureurs
 
-## API Endpoints
+## 🔌 API Endpoints
 
-### Competitions
+### Compétitions
 
 - `GET /api/v1/competitions` : Récupérer toutes les compétitions
 - `GET /api/v1/competitions/{id}` : Récupérer une compétition par ID
@@ -111,7 +128,7 @@ meilleur temps sur un parcours donné.
 - `PUT /api/v1/general-results/{competitionId}/{cyclistId}` : Mettre à jour un résultat général
 - `DELETE /api/v1/general-results/{competitionId}/{cyclistId}` : Supprimer un résultat général
 
-## Installation
+## 🚀 Installation
 
 ### Prérequis
 
@@ -119,6 +136,7 @@ meilleur temps sur un parcours donné.
 - Maven 3.11+
 - PostgreSQL
 - Tomcat 10+
+- IDE (IntelliJ IDEA recommandé)
 
 ### Configuration
 
@@ -130,7 +148,20 @@ cd CCH
 
 mvn clean install
 
-## Architecture
+## 🧪 Tests
+
+Exemple de test unitaire :
+
+java:src/test/java/com/cch/cyclingmanager/CompetitionServiceTest.java
+java:src/test/java/com/cch/cyclingmanager/CyclistServiceTest.java
+java:src/test/java/com/cch/cyclingmanager/GeneralResultServiceTest.java
+java:src/test/java/com/cch/cyclingmanager/PhaseServiceTest.java
+java:src/test/java/com/cch/cyclingmanager/ResultServiceTest.java
+java:src/test/java/com/cch/cyclingmanager/TeamServiceTest.java
+
+## 🏗 Architecture
+
+### Structure du Projet
 
 - Controllers : Gestion des requêtes HTTP et validation
 - Services : Logique métier et transactions
@@ -150,10 +181,10 @@ mvn clean install
 - Gestion des transactions
 - Protection contre les injections SQL via JPA
 
-## Contribution
+## 🤝 Contribution
 
 1. Fork le projet
-2. Créez votre branche (`git checkout -b feature/nouvelle-fonctionnalite`)
-3. Committez vos changements
-4. Push vers la branche
-5. Créez une Pull Request
+2. Créer une branche (`git checkout -b feature/AmazingFeature`)
+3. Commit (`git commit -m 'Add some AmazingFeature'`)
+4. Push (`git push origin feature/AmazingFeature`)
+5. Ouvrir une Pull Request
