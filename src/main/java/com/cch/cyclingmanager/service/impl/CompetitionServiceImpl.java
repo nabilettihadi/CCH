@@ -4,6 +4,9 @@ import com.cch.cyclingmanager.dto.CompetitionDto;
 import com.cch.cyclingmanager.entity.Competition;
 import com.cch.cyclingmanager.repository.CompetitionRepository;
 import com.cch.cyclingmanager.service.CompetitionService;
+
+import jakarta.persistence.EntityNotFoundException;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,7 +40,14 @@ public class CompetitionServiceImpl implements CompetitionService {
         if (competitionDto.getId() == null) {
             throw new IllegalArgumentException("Cannot update a competition without an ID");
         }
+
+        Competition existingCompetition = competitionRepository.findById(competitionDto.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Competition not found"));
+
         Competition competition = modelMapper.map(competitionDto, Competition.class);
+        competition.setPhases(existingCompetition.getPhases());
+        competition.setGeneralResults(existingCompetition.getGeneralResults());
+
         competition = competitionRepository.save(competition);
         return modelMapper.map(competition, CompetitionDto.class);
     }
