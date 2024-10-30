@@ -37,13 +37,14 @@ public class ResultServiceImpl implements ResultService {
     private ModelMapper modelMapper;
 
     @Override
+    @Transactional
     public ResultDto create(ResultDto resultDto) {
         if (resultDto.getPhaseId() == null) {
             throw new IllegalArgumentException("PhaseId cannot be null");
         }
+        resultDto.setPosition(0);
 
         Result result = modelMapper.map(resultDto, Result.class);
-
         Phase phase = phaseService.findById(resultDto.getPhaseId())
                 .map(phaseDto -> modelMapper.map(phaseDto, Phase.class))
                 .orElseThrow(() -> new EntityNotFoundException("Phase not found with id: " + resultDto.getPhaseId()));
@@ -51,28 +52,41 @@ public class ResultServiceImpl implements ResultService {
 
         result = resultRepository.save(result);
         calculateRankings(resultDto.getPhaseId());
-        return modelMapper.map(result, ResultDto.class);
+
+        Result updatedResult = resultRepository.findById(result.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Result not found after ranking calculation"));
+
+        return modelMapper.map(updatedResult, ResultDto.class);
     }
 
     @Override
+    @Transactional
     public ResultDto update(ResultDto resultDto) {
         if (resultDto.getPhaseId() == null || resultDto.getCyclistId() == null) {
             throw new IllegalArgumentException("Les IDs ne peuvent pas être nuls");
         }
         validateResult(resultDto);
+
         Result result = resultRepository.findById(new ResultId(resultDto.getPhaseId(), resultDto.getCyclistId()))
                 .orElseThrow(() -> new EntityNotFoundException("Result not found"));
-        result = modelMapper.map(resultDto, Result.class);
+
+        result.setTime(resultDto.getTime());
         result = resultRepository.save(result);
-        return modelMapper.map(result, ResultDto.class);
+
+        calculateRankings(resultDto.getPhaseId());
+
+        Result updatedResult = resultRepository.findById(result.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Result not found after ranking calculation"));
+
+        return modelMapper.map(updatedResult, ResultDto.class);
     }
 
     private void validateResult(ResultDto resultDto) {
         if (resultDto.getTime().isNegative()) {
             throw new IllegalArgumentException("Le temps ne peut pas être négatif");
         }
-        if (resultDto.getRank() < 0) {
-            throw new IllegalArgumentException("Le rang ne peut pas être négatif");
+        if (resultDto.getPosition() < 0) {
+            throw new IllegalArgumentException("La position ne peut pas être négative");
         }
     }
 
@@ -132,14 +146,21 @@ public class ResultServiceImpl implements ResultService {
     }
 
     @Override
+    @Transactional
     public void calculateRankings(Long phaseId) {
         List<ResultDto> results = findByPhaseId(phaseId);
         results.sort(Comparator.comparing(ResultDto::getTime));
+
         for (int i = 0; i < results.size(); i++) {
             ResultDto result = results.get(i);
-            result.setRank(i + 1);
-            update(result);
+
+            Result resultEntity = resultRepository.findById(new ResultId(phaseId, result.getCyclistId()))
+                    .orElseThrow(() -> new EntityNotFoundException("Result not found"));
+
+            resultEntity.setPosition(i + 1);
+            resultRepository.save(resultEntity);
         }
+
         updateGeneralResults(phaseId);
     }
 

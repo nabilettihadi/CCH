@@ -62,7 +62,7 @@ class ResultServiceTest {
         resultDto.setPhaseId(1L);
         resultDto.setCyclistId(1L);
         resultDto.setTime(Duration.ofMinutes(30));
-        resultDto.setRank(1);
+        resultDto.setPosition(1); 
 
         result = new Result();
         result.setId(resultId);
@@ -151,7 +151,7 @@ class ResultServiceTest {
 
     @Test
     void testUpdateWithNegativeRank() {
-        resultDto.setRank(-1);
+        resultDto.setPosition(-1);
         assertThrows(IllegalArgumentException.class, () -> resultService.update(resultDto));
     }
 

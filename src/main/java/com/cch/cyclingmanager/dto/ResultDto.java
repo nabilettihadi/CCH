@@ -1,7 +1,7 @@
 package com.cch.cyclingmanager.dto;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
 import java.time.Duration;
@@ -14,8 +14,8 @@ public class ResultDto {
     @NotNull
     private Long cyclistId;
 
-    @Positive
-    private int rank;
+    @Min(0)
+    private int position;
 
     @NotNull
     private Duration time;
@@ -26,7 +26,7 @@ public class ResultDto {
     public ResultDto(Long phaseId, Long cyclistId, int rank, Duration time) {
         this.phaseId = phaseId;
         this.cyclistId = cyclistId;
-        this.rank = rank;
+        this.position = rank;
         this.time = time;
     }
 }
