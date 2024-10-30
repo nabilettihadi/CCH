@@ -1,6 +1,8 @@
 package com.cch.cyclingmanager.entity;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
@@ -27,6 +29,8 @@ public class Phase {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "competition_id")
     @NotNull(message = "La compétition ne peut pas être nulle")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Competition competition;
 
     @OneToMany(mappedBy = "phase", cascade = CascadeType.ALL, orphanRemoval = true)
