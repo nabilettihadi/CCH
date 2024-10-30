@@ -3,6 +3,8 @@ package com.cch.cyclingmanager.entity;
 import lombok.Data;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.util.Set;
 
@@ -22,5 +24,7 @@ public class Team {
     private String country;
 
     @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Set<Cyclist> cyclists;
 }

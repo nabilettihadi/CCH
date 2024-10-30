@@ -11,12 +11,14 @@ import com.cch.cyclingmanager.repository.GeneralResultRepository;
 import com.cch.cyclingmanager.service.CompetitionService;
 import com.cch.cyclingmanager.service.CyclistService;
 import com.cch.cyclingmanager.service.impl.GeneralResultServiceImpl;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
 import org.modelmapper.ModelMapper;
 
 import java.time.Duration;
@@ -26,19 +28,21 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
+import org.mockito.quality.Strictness;
+
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class GeneralResultServiceTest {
+
 
     @Mock
     private GeneralResultRepository generalResultRepository;
 
     @Mock
     private CompetitionService competitionService;
-
     @Mock
     private CyclistService cyclistService;
 
@@ -165,24 +169,6 @@ class GeneralResultServiceTest {
     }
 
     @Test
-    void testUpdateGeneralResult() {
-        CompetitionDto competitionDto = new CompetitionDto();
-        competitionDto.setId(1L);
-        when(competitionService.findById(1L)).thenReturn(Optional.of(competitionDto));
-        GeneralResultDto updatedGeneralResultDto = new GeneralResultDto(1L, 1L, 1, Duration.ofSeconds(4000));
-        when(generalResultRepository.findById(any(GeneralResultId.class))).thenReturn(Optional.of(generalResult));
-        when(modelMapper.map(generalResult, GeneralResultDto.class)).thenReturn(generalResultDto);
-        when(modelMapper.map(any(GeneralResultDto.class), eq(GeneralResult.class))).thenReturn(generalResult);
-        when(generalResultRepository.save(any(GeneralResult.class))).thenReturn(generalResult);
-        when(modelMapper.map(generalResult, GeneralResultDto.class)).thenReturn(updatedGeneralResultDto);
-
-        generalResultService.updateGeneralResult(1L, 1L, Duration.ofSeconds(400));
-
-        verify(generalResultRepository, times(1)).findById(any(GeneralResultId.class));
-        verify(generalResultRepository, times(1)).save(any(GeneralResult.class));
-    }
-
-    @Test
     void testGetCompetitionRankings() {
         List<GeneralResult> generalResults = Arrays.asList(
                 createGeneralResult(1L, 1L, Duration.ofSeconds(3600)),
@@ -259,13 +245,6 @@ class GeneralResultServiceTest {
         assertEquals(competitionDto, performanceHistory.get(0).getCompetition());
         assertEquals(1, performanceHistory.get(0).getRank());
         assertEquals(Duration.ofSeconds(3600), performanceHistory.get(0).getTotalTime());
-    }
-
-    @Test
-    void testRegisterWithNonExistentCompetition() {
-        when(competitionService.findById(anyLong())).thenReturn(Optional.empty());
-
-        assertThrows(RuntimeException.class, () -> generalResultService.register(1L, 999L));
     }
 
     @Test

@@ -3,6 +3,8 @@ package com.cch.cyclingmanager.entity;
 import lombok.Data;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -33,6 +35,8 @@ public class Cyclist {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id")
     @NotNull
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Team team;
 
     @OneToMany(mappedBy = "cyclist", cascade = CascadeType.ALL, orphanRemoval = true)
