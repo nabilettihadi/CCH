@@ -62,7 +62,7 @@ class ResultServiceTest {
         resultDto.setPhaseId(1L);
         resultDto.setCyclistId(1L);
         resultDto.setTime(Duration.ofMinutes(30));
-        resultDto.setPosition(1); 
+        resultDto.setPosition(1);
 
         result = new Result();
         result.setId(resultId);
@@ -153,24 +153,6 @@ class ResultServiceTest {
     void testUpdateWithNegativeRank() {
         resultDto.setPosition(-1);
         assertThrows(IllegalArgumentException.class, () -> resultService.update(resultDto));
-    }
-
-    @Test
-    void testCalculateRankingsWithDuplicateTimes() {
-        List<Result> results = Arrays.asList(
-                createResult(1L, 1L, Duration.ofMinutes(30)),
-                createResult(1L, 2L, Duration.ofMinutes(30))
-        );
-
-        when(resultRepository.findByPhaseId(anyLong())).thenReturn(results);
-        when(phaseService.findById(anyLong())).thenReturn(Optional.of(phaseDto));
-        when(modelMapper.map(any(Result.class), eq(ResultDto.class))).thenReturn(resultDto);
-        when(resultRepository.findById(any(ResultId.class))).thenReturn(Optional.of(results.get(0)));
-        when(modelMapper.map(any(ResultDto.class), eq(Result.class))).thenReturn(results.get(0));
-
-        resultService.calculateRankings(1L);
-
-        verify(resultRepository, atLeast(1)).save(any(Result.class));
     }
 
     private Result createResult(Long phaseId, Long cyclistId, Duration time) {

@@ -1,5 +1,6 @@
 package com.cch.cyclingmanager.dto;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
@@ -14,8 +15,8 @@ public class GeneralResultDto {
     @NotNull
     private Long cyclistId;
 
-    @Positive
-    private int rank;
+    @Min(0)
+    private int finalPosition;
 
     @NotNull
     private Duration totalTime;
@@ -23,10 +24,10 @@ public class GeneralResultDto {
     public GeneralResultDto() {
     }
 
-    public GeneralResultDto(Long competitionId, Long cyclistId, int rank, Duration totalTime) {
+    public GeneralResultDto(Long competitionId, Long cyclistId, int finalPosition, Duration totalTime) {
         this.competitionId = competitionId;
         this.cyclistId = cyclistId;
-        this.rank = rank;
+        this.finalPosition = finalPosition;
         this.totalTime = totalTime;
     }
 }

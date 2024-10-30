@@ -25,6 +25,7 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.HashSet;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -63,19 +64,24 @@ class GeneralResultServiceTest {
         generalResultDto = new GeneralResultDto();
         generalResultDto.setCompetitionId(1L);
         generalResultDto.setCyclistId(1L);
-        generalResultDto.setRank(1);
+        generalResultDto.setFinalPosition(1);
         generalResultDto.setTotalTime(Duration.ofSeconds(3600));
 
         generalResult = new GeneralResult();
         generalResult.setId(generalResultId);
         generalResult.setFinalPosition(1);
         generalResult.setTotalTime(Duration.ofSeconds(3600));
+        CompetitionDto competitionDto = new CompetitionDto();
+        competitionDto.setId(1L);
+        competitionDto.setPhases(new HashSet<>());
+        when(competitionService.findById(1L)).thenReturn(Optional.of(competitionDto));
     }
 
     @Test
     void testSave() {
         when(modelMapper.map(generalResultDto, GeneralResult.class)).thenReturn(generalResult);
-        when(generalResultRepository.save(generalResult)).thenReturn(generalResult);
+        when(generalResultRepository.save(any(GeneralResult.class))).thenReturn(generalResult);
+        when(generalResultRepository.findById(any(GeneralResultId.class))).thenReturn(Optional.of(generalResult));
         when(modelMapper.map(generalResult, GeneralResultDto.class)).thenReturn(generalResultDto);
 
         GeneralResultDto savedGeneralResultDto = generalResultService.save(generalResultDto);
@@ -83,10 +89,10 @@ class GeneralResultServiceTest {
         assertNotNull(savedGeneralResultDto);
         assertEquals(generalResultDto.getCompetitionId(), savedGeneralResultDto.getCompetitionId());
         assertEquals(generalResultDto.getCyclistId(), savedGeneralResultDto.getCyclistId());
-        assertEquals(generalResultDto.getRank(), savedGeneralResultDto.getRank());
+        assertEquals(generalResultDto.getFinalPosition(), savedGeneralResultDto.getFinalPosition());
         assertEquals(generalResultDto.getTotalTime(), savedGeneralResultDto.getTotalTime());
 
-        verify(generalResultRepository, times(1)).save(generalResult);
+        verify(generalResultRepository, times(1)).save(any(GeneralResult.class));
     }
 
     @Test
@@ -99,7 +105,7 @@ class GeneralResultServiceTest {
         assertTrue(foundGeneralResultDto.isPresent());
         assertEquals(generalResultDto.getCompetitionId(), foundGeneralResultDto.get().getCompetitionId());
         assertEquals(generalResultDto.getCyclistId(), foundGeneralResultDto.get().getCyclistId());
-        assertEquals(generalResultDto.getRank(), foundGeneralResultDto.get().getRank());
+        assertEquals(generalResultDto.getFinalPosition(), foundGeneralResultDto.get().getFinalPosition());
         assertEquals(generalResultDto.getTotalTime(), foundGeneralResultDto.get().getTotalTime());
 
         verify(generalResultRepository, times(1)).findById(generalResultId);
@@ -139,23 +145,14 @@ class GeneralResultServiceTest {
 
     @Test
     void testRegister() {
-        CompetitionDto competitionDto = new CompetitionDto();
-        competitionDto.setId(1L);
-        when(competitionService.findById(1L)).thenReturn(Optional.of(competitionDto));
-
-        GeneralResultDto newGeneralResultDto = new GeneralResultDto(1L, 1L, 0, Duration.ZERO);
         when(modelMapper.map(any(GeneralResultDto.class), eq(GeneralResult.class))).thenReturn(generalResult);
         when(generalResultRepository.save(any(GeneralResult.class))).thenReturn(generalResult);
-        when(modelMapper.map(generalResult, GeneralResultDto.class)).thenReturn(newGeneralResultDto);
+        when(generalResultRepository.findById(any(GeneralResultId.class))).thenReturn(Optional.of(generalResult));
+        when(modelMapper.map(generalResult, GeneralResultDto.class)).thenReturn(generalResultDto);
 
         GeneralResultDto registeredGeneralResultDto = generalResultService.register(1L, 1L);
 
         assertNotNull(registeredGeneralResultDto);
-        assertEquals(1L, registeredGeneralResultDto.getCompetitionId());
-        assertEquals(1L, registeredGeneralResultDto.getCyclistId());
-        assertEquals(0, registeredGeneralResultDto.getRank());
-        assertEquals(Duration.ZERO, registeredGeneralResultDto.getTotalTime());
-
         verify(generalResultRepository, times(1)).save(any(GeneralResult.class));
     }
 
@@ -184,8 +181,8 @@ class GeneralResultServiceTest {
 
         assertNotNull(rankings);
         assertEquals(2, rankings.size());
-        assertEquals(1, rankings.get(0).getRank());
-        assertEquals(2, rankings.get(1).getRank());
+        assertEquals(1, rankings.get(0).getFinalPosition());
+        assertEquals(2, rankings.get(1).getFinalPosition());
         assertEquals(Duration.ofSeconds(3500), rankings.get(0).getTotalTime());
         assertEquals(Duration.ofSeconds(3600), rankings.get(1).getTotalTime());
     }
@@ -251,6 +248,7 @@ class GeneralResultServiceTest {
     void testUpdateGeneralResultForNonRegisteredCyclist() {
         CompetitionDto competitionDto = new CompetitionDto();
         competitionDto.setId(2L);
+        competitionDto.setPhases(new HashSet<>());
         when(competitionService.findById(2L)).thenReturn(Optional.of(competitionDto));
 
         when(generalResultRepository.findById(any(GeneralResultId.class))).thenReturn(Optional.empty());

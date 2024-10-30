@@ -7,6 +7,9 @@ import com.cch.cyclingmanager.repository.GeneralResultRepository;
 import com.cch.cyclingmanager.service.CompetitionService;
 import com.cch.cyclingmanager.service.CyclistService;
 import com.cch.cyclingmanager.service.GeneralResultService;
+
+import jakarta.persistence.EntityNotFoundException;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,10 +41,17 @@ public class GeneralResultServiceImpl implements GeneralResultService {
     private ModelMapper modelMapper;
 
     @Override
+    @Transactional
     public GeneralResultDto save(GeneralResultDto generalResultDto) {
         GeneralResult generalResult = modelMapper.map(generalResultDto, GeneralResult.class);
         generalResult = generalResultRepository.save(generalResult);
-        return modelMapper.map(generalResult, GeneralResultDto.class);
+
+        updateRankings(generalResultDto.getCompetitionId());
+
+        GeneralResult updatedResult = generalResultRepository.findById(generalResult.getId())
+                .orElseThrow(() -> new EntityNotFoundException("General Result not found after ranking calculation"));
+
+        return modelMapper.map(updatedResult, GeneralResultDto.class);
     }
 
     @Override
@@ -87,7 +97,7 @@ public class GeneralResultServiceImpl implements GeneralResultService {
         GeneralResultDto generalResultDto = new GeneralResultDto();
         generalResultDto.setCyclistId(cyclistId);
         generalResultDto.setCompetitionId(competitionId);
-        generalResultDto.setRank(0);
+        generalResultDto.setFinalPosition(0);
         generalResultDto.setTotalTime(Duration.ZERO);
         return save(generalResultDto);
     }
@@ -104,11 +114,16 @@ public class GeneralResultServiceImpl implements GeneralResultService {
     }
 
     @Override
+    @Transactional
     public void updateGeneralResult(Long competitionId, Long cyclistId, Duration time) {
         GeneralResultId id = new GeneralResultId(competitionId, cyclistId);
-        GeneralResultDto generalResult = findById(id).orElse(new GeneralResultDto(competitionId, cyclistId, 0, Duration.ZERO));
-        generalResult.setTotalTime(generalResult.getTotalTime().plus(time));
-        save(generalResult);
+        GeneralResultDto generalResult = findById(id)
+                .orElse(new GeneralResultDto(competitionId, cyclistId, 0, Duration.ZERO));
+
+
+        generalResult.setTotalTime(time);
+
+        GeneralResult savedResult = generalResultRepository.save(modelMapper.map(generalResult, GeneralResult.class));
         updateRankings(competitionId);
     }
 
@@ -116,9 +131,21 @@ public class GeneralResultServiceImpl implements GeneralResultService {
     public List<GeneralResultDto> getCompetitionRankings(Long competitionId) {
         List<GeneralResultDto> results = findByCompetitionId(competitionId);
         results.sort(Comparator.comparing(GeneralResultDto::getTotalTime));
+
+        int currentPosition = 1;
+        Duration previousTime = null;
+
         for (int i = 0; i < results.size(); i++) {
-            results.get(i).setRank(i + 1);
+            GeneralResultDto result = results.get(i);
+
+            if (previousTime != null && !previousTime.equals(result.getTotalTime())) {
+                currentPosition = i + 1;
+            }
+
+            result.setFinalPosition(currentPosition);
+            previousTime = result.getTotalTime();
         }
+
         return results;
     }
 
@@ -136,7 +163,7 @@ public class GeneralResultServiceImpl implements GeneralResultService {
                 .collect(Collectors.toList());
         overallResults.sort(Comparator.comparing(GeneralResultDto::getTotalTime));
         for (int i = 0; i < overallResults.size(); i++) {
-            overallResults.get(i).setRank(i + 1);
+            overallResults.get(i).setFinalPosition(i + 1);
         }
         return overallResults;
     }
@@ -160,18 +187,68 @@ public class GeneralResultServiceImpl implements GeneralResultService {
                 .map(result -> {
                     CompetitionDto competition = competitionService.findById(result.getCompetitionId())
                             .orElseThrow(() -> new RuntimeException("Competition not found"));
-                    return new CyclistPerformanceDto(competition, result.getRank(), result.getTotalTime());
+                    return new CyclistPerformanceDto(competition, result.getFinalPosition(), result.getTotalTime());
                 })
                 .collect(Collectors.toList());
     }
 
+
     private void updateRankings(Long competitionId) {
         List<GeneralResultDto> results = findByCompetitionId(competitionId);
-        results.sort(Comparator.comparing(GeneralResultDto::getTotalTime));
-        for (int i = 0; i < results.size(); i++) {
-            GeneralResultDto result = results.get(i);
-            result.setRank(i + 1);
-            save(result);
+        CompetitionDto competition = competitionService.findById(competitionId)
+                .orElseThrow(() -> new EntityNotFoundException("Competition not found"));
+
+        Map<Long, Duration> totalTimes = new HashMap<>();
+        for (GeneralResultDto result : results) {
+            totalTimes.put(result.getCyclistId(), result.getTotalTime());
         }
+
+        if (competition.getPhases().size() <= 1) {
+            results.sort(Comparator.comparing(GeneralResultDto::getTotalTime));
+
+            int currentPosition = 1;
+            Duration previousTime = null;
+
+            for (int i = 0; i < results.size(); i++) {
+                GeneralResultDto result = results.get(i);
+                if (previousTime != null && !previousTime.equals(result.getTotalTime())) {
+                    currentPosition = i + 1;
+                }
+
+                updateFinalPositionAndTime(result.getCompetitionId(), result.getCyclistId(), currentPosition, result.getTotalTime());
+                previousTime = result.getTotalTime();
+            }
+        } else {
+
+            Map<Long, List<Integer>> cyclistPositions = new HashMap<>();
+
+            for (GeneralResultDto result : results) {
+                cyclistPositions.computeIfAbsent(result.getCyclistId(), k -> new ArrayList<>())
+                        .add(result.getFinalPosition());
+            }
+
+            List<Map.Entry<Long, Double>> averagePositions = cyclistPositions.entrySet().stream()
+                    .map(entry -> Map.entry(
+                            entry.getKey(),
+                            entry.getValue().stream().mapToInt(Integer::intValue).average().orElse(0.0)
+                    ))
+                    .sorted(Map.Entry.comparingByValue())
+                    .collect(Collectors.toList());
+
+            for (int i = 0; i < averagePositions.size(); i++) {
+                Long cyclistId = averagePositions.get(i).getKey();
+                updateFinalPositionAndTime(competitionId, cyclistId, i + 1, totalTimes.get(cyclistId));
+            }
+        }
+    }
+
+    private void updateFinalPositionAndTime(Long competitionId, Long cyclistId, int position, Duration totalTime) {
+        GeneralResult resultEntity = generalResultRepository.findById(
+                        new GeneralResultId(competitionId, cyclistId))
+                .orElseThrow(() -> new EntityNotFoundException("General Result not found"));
+
+        resultEntity.setFinalPosition(position);
+        resultEntity.setTotalTime(totalTime);
+        generalResultRepository.save(resultEntity);
     }
 }
